@@ -1,10 +1,107 @@
 package dataAnalysisAlgorithms;
 
-import java.util.Scanner;
+import java.util.*;
+
 import tech.tablesaw.api.Table;
 import tech.tablesaw.columns.Column;
 
 public class naiveBayes {
+    public static void fillMissingValues(Table orgiTable,Table missTable,String attr) {
+        //Creating variables
+        long totaRows=orgiTable.rowCount();
+        long missRows=missTable.rowCount();
+        Scanner sc=new Scanner(System.in);
+        Table tempPredTable;
+        String targName=attr;
+
+        //Determing datatype of target variable
+        Column<?> targVari=orgiTable.column(targName);
+        String targType=targVari.type().name();
+        System.out.println("Target variable datatype: "+targType);
+
+        //Determing the all possible values of target variable
+        List<Object> possValues=new ArrayList<>();
+        List<Double> probabilty=new ArrayList<>();
+        List<Table> tempTable=new ArrayList<>();
+        for(int i=0;i<totaRows;i++) {
+            Table temporary;
+            Object value;
+            if(targType.equals("INTEGER")) {
+                value=orgiTable.intColumn(targName).getInt(i);
+                temporary=orgiTable.where(orgiTable.intColumn(targName).isEqualTo((int)value));
+            } else if(targType.equals("DOUBLE")) {
+                value=orgiTable.doubleColumn(targName).getDouble(i);
+                temporary=orgiTable.where(orgiTable.doubleColumn(targName).isEqualTo((double)value));
+            } else if(targType.equals("STRING")) {
+                value=orgiTable.stringColumn(targName).getString(i);
+                temporary=orgiTable.where(orgiTable.stringColumn(targName).isEqualTo((String)value));
+            } else {
+                return;
+            }
+            if(value!=null && value!="" && !possValues.contains(value)) {
+                possValues.add(value);
+                tempTable.add(temporary);
+            }
+        }
+
+        //Inputting predictor variables number
+        System.out.print("Enter the number of predictor variable: ");
+        int predCoun=sc.nextInt();
+        //pred[] to store predictor variables name
+        String[] pred=new String[predCoun];
+        //predRows[] to store predictor variables rows
+        double[] predRows=new double[predCoun];
+
+        //Inputting name of predictor variables
+        System.out.println("Enter the names of predictor variables: ");
+        for(int i=0;i<predCoun;i++) {
+            System.out.print("Enter the predictor variable name: ");
+            pred[i]=sc.next();
+        }
+
+        //Iterating over columns having target variable as missing
+        for(int i=0;i<missRows;i++) {
+            double maxiprob=0;
+            Object desiredValue=null;
+            for(int j=0;j<(possValues.size());j++) {
+                double finalProb=1;
+                long targRows=tempTable.get(j).rowCount();
+                for(int k=0;k<predCoun;k++) {
+                    String predictorName=pred[k];
+                    Column<?> predColumn=missTable.column(predictorName);
+                    String predType=predColumn.type().name();
+                    //System.out.println("Predictor variable datatype: "+predType);
+                    if(predType.equals("INTEGER")) {
+                        long predValu=missTable.intColumn(pred[k]).getInt(i);
+                        tempPredTable=orgiTable.where(tempTable.get(j).intColumn(predictorName).isEqualTo(predValu));
+                    } else if(predType.equals("DOUBLE")) {
+                        double predValu=missTable.doubleColumn(pred[k]).getDouble(i);
+                        tempPredTable=orgiTable.where(tempTable.get(j).doubleColumn(predictorName).isEqualTo(predValu));
+                    } else if(predType.equals("STRING")) {
+                        String predValu=missTable.stringColumn(pred[k]).getString(i);
+                        tempPredTable=orgiTable.where(tempTable.get(j).stringColumn(predictorName).isEqualTo(predValu));
+                    } else {
+                        return;
+                    }
+                    //Finding the probability that target value happens provided predictor value has happened
+                    predRows[k]=tempPredTable.rowCount();
+                    predRows[k]/=targRows;
+                    finalProb*=predRows[k];
+                }
+                finalProb*=targRows;
+                finalProb/=totaRows;
+                probabilty.add(finalProb);
+                if(maxiprob<finalProb) {
+                    maxiprob=finalProb;
+                    desiredValue=possValues.get(j);
+                }
+            }
+            System.out.println("DesiredValue: "+desiredValue+"    MaximumProbability: "+maxiprob);
+        }
+        /*for(Object o:possValues) {
+            System.out.println(o+" "+probabilty.get(possValues.indexOf(o)));
+        }*/
+    }
     public static void main(String args[]) {
         //Creating variables
         Table tempTable,tempPredTable;
