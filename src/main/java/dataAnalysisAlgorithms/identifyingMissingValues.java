@@ -16,7 +16,7 @@ public class identifyingMissingValues extends naiveBayes {
         HashMap<String,Table> hm=new HashMap<>();
 
         //Importing data
-        Table table=Table.read().csv("C:\\Users\\Asus\\OneDrive\\Documents\\Data Science\\student-mat.csv");
+        Table table=Table.read().csv("C:\\Users\\Asus\\OneDrive\\Documents\\Data Science\\Datasets\\student-mat.csv");
         Table structureOfTable=table.structure();
 
         //Storing attributes
@@ -55,7 +55,7 @@ public class identifyingMissingValues extends naiveBayes {
         //Displaying Missing Value Table
         for(Object s:hm.keySet()) {
             System.out.println();
-            fillMissingValues(table,hm.get(s),String.valueOf(s));
+            fillMissingValuesByNaiveBayes(table,hm.get(s),String.valueOf(s));
         }
         long endTime01=System.currentTimeMillis();
         long executionTime01=endTime01-startTime01;

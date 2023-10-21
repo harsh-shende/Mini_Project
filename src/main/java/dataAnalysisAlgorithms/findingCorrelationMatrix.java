@@ -11,7 +11,7 @@ public class findingCorrelationMatrix {
         long startTime01=System.currentTimeMillis();
 
         //Importing data
-        Table table=Table.read().csv("C:\\Users\\Asus\\OneDrive\\Documents\\Data Science\\PokemonStats.csv");
+        Table table=Table.read().csv("C:\\Users\\Asus\\OneDrive\\Documents\\Data Science\\Datasets\\PokemonStats.csv");
         Table structureOfTable=table.structure();
         Table summaryOfTable=table.summary();
         int totalRows=table.rowCount();

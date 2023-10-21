@@ -1,12 +1,11 @@
 package dataAnalysisAlgorithms;
 
 import java.util.*;
-
 import tech.tablesaw.api.Table;
 import tech.tablesaw.columns.Column;
 
 public class naiveBayes {
-    public static void fillMissingValues(Table orgiTable,Table missTable,String attr) {
+    public static void fillMissingValuesByNaiveBayes(Table orgiTable,Table missTable,String attr) {
         //Creating variables
         long totaRows=orgiTable.rowCount();
         long missRows=missTable.rowCount();
@@ -109,7 +108,7 @@ public class naiveBayes {
         double finalProb=1;
 
         //Importing data
-        Table table=Table.read().csv("C:\\Users\\Asus\\OneDrive\\Documents\\Data Science\\student-mat.csv");
+        Table table=Table.read().csv("C:\\Users\\Asus\\OneDrive\\Documents\\Data Science\\Datasets\\student-mat.csv");
         Table structureOfTable=table.structure();
         totaRows=table.rowCount();
 
