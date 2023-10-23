@@ -1,19 +1,40 @@
 package dataAnalysisAlgorithms;
 
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.NumericColumn;
 import tech.tablesaw.api.Table;
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.List;
+import tech.tablesaw.columns.Column;
+
+import java.util.*;
 
 public class replacingByStats {
     public static void main(String args[]) {
+        //Creating variables
+        long totaRows;
+
         //Importing data
-        Scanner sc=new Scanner(System.in);
         Table table=Table.read().csv("C:\\Users\\Asus\\OneDrive\\Documents\\Data Science\\Datasets\\student-mat.csv");
-        NumericColumn<?>[] numericColumn=table.numericColumns().toArray(new NumericColumn[0]);
-        for(int i=0;i<numericColumn.length;i++) {
-            System.out.println(numericColumn[i]);
+        Table structureOfTable=table.structure();
+        totaRows=table.rowCount();
+
+        //Storing attributes
+        String[] attr=table.columnNames().toArray(new String[0]);
+        int contVariCount=structureOfTable.stringColumn(2).isEqualTo("INTEGER").size();
+        contVariCount+=structureOfTable.stringColumn(2).isEqualTo("DOUBLE").size();
+        Scanner sc=new Scanner(System.in);
+
+        //Storing continuous variable name
+        String[] contVariNames=new String[contVariCount];
+        for(int i=0,j=0;i<table.columnCount() && j<contVariCount;i++) {
+            if(Objects.equals(structureOfTable.column(2).getString(i),"INTEGER")) {
+                contVariNames[j]=structureOfTable.column(1).getString(i);
+                j+=1;
+            }
+            if(Objects.equals(structureOfTable.column(2).getString(i),"DOUBLE")) {
+                contVariNames[j]=structureOfTable.column(1).getString(i);
+                j+=1;
+            }
         }
 
         //Taking input
@@ -28,49 +49,166 @@ public class replacingByStats {
         int choice=sc.nextInt();
         switch(choice) {
             case 01://Replace by Mean
-                List<Double> mean=new ArrayList<>();
-                for(NumericColumn<?> nc:numericColumn) {
-                    mean.add(nc.mean());
-                    System.out.println(nc.name()+"    "+nc.mean());
+                for(int i=0;i<contVariCount;i++) {
+                    double desiMean=0;
+                    if(table.column(contVariNames[i]).countMissing()!=0) {
+                        NumericColumn<?> desiVari=table.nCol(contVariNames[i]);
+                        desiMean=desiVari.mean();
+                        System.out.println(desiMean);
+                        Column<?> desiVari01=table.column(contVariNames[i]);
+                        String desiType=desiVari01.type().name();
+                        if(desiType.equals("INTEGER")) {
+                            IntColumn ic=(IntColumn)table.column(contVariNames[i]);
+                            Column<Integer> ci=ic.setMissingTo((int)desiMean);
+                            table.replaceColumn(contVariNames[i],ci);
+                        } else {
+                            DoubleColumn ic=(DoubleColumn)table.column(contVariNames[i]);
+                            Column<Double> ci=ic.setMissingTo(desiMean);
+                            table.replaceColumn(contVariNames[i],ci);
+                        }
+                    }
                 }
                 break;
             case 02://Replace by Mode
-                List<Double> mode=new ArrayList<>();
-                for(NumericColumn<?> nc:numericColumn) {
-
+                for(int i=0;i<contVariCount;i++) {
+                    long maxiFreq=0;
+                    double desiMode=0;
+                    if(table.column(contVariNames[i]).countMissing()!=0) {
+                        Column<?> desiVari01=table.column(contVariNames[i]);
+                        String desiType=desiVari01.type().name();
+                        if(desiType.equals("INTEGER")) {
+                            HashMap<Integer,Long> hm=new HashMap<>();
+                            for(int j=0;j<totaRows;j++) {
+                                if(!table.column(contVariNames[i]).isMissing(j)) {
+                                    int temp=table.intColumn(contVariNames[i]).getInt(j);
+                                    if(hm.containsKey(temp)) {
+                                        hm.put(temp,hm.get(temp)+1);
+                                    } else {
+                                        hm.put(temp,1L);
+                                    }
+                                }
+                            }
+                            for(int l:hm.keySet()) {
+                                if(maxiFreq<hm.get(l)) {
+                                    maxiFreq=hm.get(l);
+                                    desiMode=l;
+                                }
+                            }
+                            IntColumn ic=(IntColumn)table.column(contVariNames[i]);
+                            Column<Integer> ci=ic.setMissingTo((int)desiMode);
+                            table.replaceColumn(contVariNames[i],ci);
+                        } else {
+                            HashMap<Double,Long> hm=new HashMap<>();
+                            for(int j=0;j<totaRows;j++) {
+                                if(!table.column(contVariNames[i]).isMissing(j)) {
+                                    double temp=table.doubleColumn(contVariNames[i]).getDouble(j);
+                                    if(hm.containsKey(temp)) {
+                                        hm.put(temp,hm.get(temp)+1);
+                                    } else {
+                                        hm.put(temp,1L);
+                                    }
+                                }
+                            }
+                            for(double l:hm.keySet()) {
+                                if(maxiFreq<hm.get(l)) {
+                                    maxiFreq=hm.get(l);
+                                    desiMode=l;
+                                }
+                            }
+                            DoubleColumn ic=(DoubleColumn)table.column(contVariNames[i]);
+                            Column<Double> ci=ic.setMissingTo(desiMode);
+                            table.replaceColumn(contVariNames[i],ci);
+                        }
+                    }
                 }
                 break;
             case 03://Replace by Median
-                List<Double> median=new ArrayList<>();
-                for(NumericColumn<?> nc:numericColumn) {
-                    median.add(nc.median());
-                    System.out.println(nc.name()+"    "+nc.median());
+                for(int i=0;i<contVariCount;i++) {
+                    double desiMedi=0;
+                    if(table.column(contVariNames[i]).countMissing()!=0) {
+                        NumericColumn<?> desiVari=table.nCol(contVariNames[i]);
+                        desiMedi=desiVari.median();
+                        System.out.println(desiMedi);
+                        Column<?> desiVari01=table.column(contVariNames[i]);
+                        String desiType=desiVari01.type().name();
+                        if(desiType.equals("INTEGER")) {
+                            IntColumn ic=(IntColumn)table.column(contVariNames[i]);
+                            Column<Integer> ci=ic.setMissingTo((int)desiMedi);
+                            table.replaceColumn(contVariNames[i],ci);
+                        } else {
+                            DoubleColumn ic=(DoubleColumn)table.column(contVariNames[i]);
+                            Column<Double> ci=ic.setMissingTo(desiMedi);
+                            table.replaceColumn(contVariNames[i],ci);
+                        }
+                    }
                 }
                 break;
             case 04://Replace by Minimum
-                List<Double> mini=new ArrayList<>();
-                for(NumericColumn<?> nc:numericColumn) {
-                    mini.add(nc.min());
-                    System.out.println(nc.name()+"    "+nc.min());
+                for(int i=0;i<contVariCount;i++) {
+                    double desiMini=0;
+                    if(table.column(contVariNames[i]).countMissing()!=0) {
+                        NumericColumn<?> desiVari=table.nCol(contVariNames[i]);
+                        desiMini=desiVari.min();
+                        System.out.println(desiMini);
+                        Column<?> desiVari01=table.column(contVariNames[i]);
+                        String desiType=desiVari01.type().name();
+                        if(desiType.equals("INTEGER")) {
+                            IntColumn ic=(IntColumn)table.column(contVariNames[i]);
+                            Column<Integer> ci=ic.setMissingTo((int)desiMini);
+                            table.replaceColumn(contVariNames[i],ci);
+                        } else {
+                            DoubleColumn ic=(DoubleColumn)table.column(contVariNames[i]);
+                            Column<Double> ci=ic.setMissingTo(desiMini);
+                            table.replaceColumn(contVariNames[i],ci);
+                        }
+                    }
                 }
                 break;
             case 05://Replace by Maximum
-                List<Double> maxi=new ArrayList<>();
-                for(NumericColumn<?> nc:numericColumn) {
-                    maxi.add(nc.max());
-                    System.out.println(nc.name()+"    "+nc.max());
+                for(int i=0;i<contVariCount;i++) {
+                    double desiMaxi=0;
+                    if(table.column(contVariNames[i]).countMissing()!=0) {
+                        NumericColumn<?> desiVari=table.nCol(contVariNames[i]);
+                        desiMaxi=desiVari.max();
+                        System.out.println(desiMaxi);
+                        Column<?> desiVari01=table.column(contVariNames[i]);
+                        String desiType=desiVari01.type().name();
+                        if(desiType.equals("INTEGER")) {
+                            IntColumn ic=(IntColumn)table.column(contVariNames[i]);
+                            Column<Integer> ci=ic.setMissingTo((int)desiMaxi);
+                            table.replaceColumn(contVariNames[i],ci);
+                        } else {
+                            DoubleColumn ic=(DoubleColumn)table.column(contVariNames[i]);
+                            Column<Double> ci=ic.setMissingTo(desiMaxi);
+                            table.replaceColumn(contVariNames[i],ci);
+                        }
+                    }
                 }
                 break;
             case 06://Replace by Global Constant
-                for(NumericColumn<?> nc:numericColumn) {
-                    System.out.print("Enter global constant for "+nc.name()+": ");
-                    double gc=sc.nextDouble();
-
+                for(int i=0;i<contVariCount;i++) {
+                    double globCons=0;
+                    if(table.column(contVariNames[i]).countMissing()!=0) {
+                        System.out.print("Enter Global Constant for "+contVariNames[i]+": ");
+                        globCons=sc.nextDouble();
+                        Column<?> desiVari01=table.column(contVariNames[i]);
+                        String desiType=desiVari01.type().name();
+                        if(desiType.equals("INTEGER")) {
+                            IntColumn ic=(IntColumn)table.column(contVariNames[i]);
+                            Column<Integer> ci=ic.setMissingTo((int)globCons);
+                            table.replaceColumn(contVariNames[i],ci);
+                        } else {
+                            DoubleColumn ic=(DoubleColumn)table.column(contVariNames[i]);
+                            Column<Double> ci=ic.setMissingTo(globCons);
+                            table.replaceColumn(contVariNames[i],ci);
+                        }
+                    }
                 }
                 break;
             default://Invalid Input
                 System.out.println("Invalid Input!");
                 break;
         }
+        System.out.println(table);
     }
 }
