@@ -46,7 +46,6 @@ public class eliminatingRowsAndColumns {
                         table=table.removeColumns(attr[i]);
                     }
                 }
-                System.out.println(table);
                 break;
             case 2://Automatically eliminate rows with more than 60% missing values
                 for(int i=0;i<totalRows;i++) {
@@ -61,7 +60,6 @@ public class eliminatingRowsAndColumns {
                         totalRows-=1;
                     }
                 }
-                System.out.println(table);
                 break;
             case 3://Manually eliminate columns
                 System.out.print("Enter the number of columns you want to eliminate: ");
@@ -72,11 +70,12 @@ public class eliminatingRowsAndColumns {
                     attrToBeRemoved[i]=sc.next();
                 }
                 table=table.removeColumns(attrToBeRemoved);
-                System.out.println(table);
                 break;
             default://Invalid Input
                 System.out.println("Invalid Input!");
                 break;
         }
+        System.out.println(table);
+        table.write().toFile("C:\\Users\\Asus\\OneDrive\\Desktop\\newFile.csv");
     }
 }

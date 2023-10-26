@@ -5,7 +5,6 @@ import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.NumericColumn;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.columns.Column;
-
 import java.util.*;
 
 public class replacingByStats {
@@ -14,7 +13,7 @@ public class replacingByStats {
         long totaRows;
 
         //Importing data
-        Table table=Table.read().csv("C:\\Users\\Asus\\OneDrive\\Documents\\Data Science\\Datasets\\student-mat.csv");
+        Table table=Table.read().csv("C:\\Users\\Asus\\OneDrive\\Documents\\Data Science\\Datasets\\sample_corr.csv");
         Table structureOfTable=table.structure();
         totaRows=table.rowCount();
 
@@ -210,5 +209,6 @@ public class replacingByStats {
                 break;
         }
         System.out.println(table);
+        table.write().toFile("C:\\Users\\Asus\\OneDrive\\Desktop\\newFile.csv");
     }
 }
