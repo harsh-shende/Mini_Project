@@ -7,11 +7,11 @@ import tech.tablesaw.columns.Column;
 public class outlierDetectionUsingIQR {
     public static void main(String args[]) {
         //Importing data
-        Table table=Table.read().csv("C:\\Users\\Asus\\OneDrive\\Documents\\Data Science\\Datasets\\student-mat.csv");
+        Table table=Table.read().csv("C:\\Users\\Asus\\OneDrive\\Documents\\Data Science\\Datasets\\sample_corr.csv");
         Table structureOfTable=table.structure();
         Table summaryOfTable=table.summary();
         int totalRows=table.rowCount();
-
+        System.out.println(table);
         System.out.println(summaryOfTable);
 
         //Storing attributes
@@ -38,30 +38,34 @@ public class outlierDetectionUsingIQR {
             Column<?> desiVari=table.column(contVariNames[i]);
             String desiType=desiVari.type().name();
             if(desiType.equals("INTEGER")) {
-                IntColumn ic=(IntColumn)table.column(contVariNames[i]);
-                ic.sortAscending();
                 q1=((IntColumn)table.column(contVariNames[i])).quartile1();
                 q3=((IntColumn)table.column(contVariNames[i])).quartile3();
             } else {
-                DoubleColumn ic=(DoubleColumn)table.column(contVariNames[i]);
-                ic.sortAscending();
                 q1=((DoubleColumn)table.column(contVariNames[i])).quartile1();
                 q3=((DoubleColumn)table.column(contVariNames[i])).quartile3();
             }
             double iqr=q3-q1;
             double lowerBound=q1-(1.5*iqr);
             double upperBound=q3+(1.5*iqr);
-
+            System.out.println();
+            System.out.println("Variable: "+contVariNames[i]);
+            System.out.println("Lower Bound: "+lowerBound);
+            System.out.println("Upper Bound: "+upperBound);
+            System.out.println("IQR: "+iqr);
             //Iterating over rows
             for(int j=0;j<totalRows;j++) {
                 if(!table.column(contVariNames[i]).isMissing(j)) {
                     if(((NumberColumn<?,?>)table.column(contVariNames[i])).getDouble(j)<lowerBound || ((NumberColumn<?,?>)table.column(contVariNames[i])).getDouble(j)>upperBound) {
-                        table=table.dropRows(j);
-                        totalRows-=1;
+                        System.out.println("Outlier Found");
+                        System.out.println("Value: "+((NumberColumn<?,?>)table.column(contVariNames[i])).getDouble(j));
+                        //table=table.dropRows(j);
+                        //totalRows-=1;
                     }
                 }
             }
         }
+        System.out.println();
+        System.out.println(table);
         System.out.println(table.summary());
         table.write().toFile("C:\\Users\\Asus\\OneDrive\\Desktop\\newFile.csv");
     }

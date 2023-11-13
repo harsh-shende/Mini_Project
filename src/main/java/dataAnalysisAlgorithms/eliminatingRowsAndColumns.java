@@ -57,6 +57,7 @@ public class eliminatingRowsAndColumns {
                     }
                     if(count>=(0.6*attr.length)) {
                         table=table.dropRows(i);
+                        i-=1;
                         totalRows-=1;
                     }
                 }

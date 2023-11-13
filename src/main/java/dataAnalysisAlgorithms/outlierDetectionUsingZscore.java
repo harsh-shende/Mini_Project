@@ -5,13 +5,12 @@ import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.NumberColumn;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.columns.Column;
-
 import java.util.Objects;
 
-public class OutlierDetectionUsingZscore {
+public class outlierDetectionUsingZscore {
     public static void main(String args[]) {
         //Importing data
-        Table table=Table.read().csv("C:\\Users\\Asus\\OneDrive\\Documents\\Data Science\\Datasets\\student-mat.csv");
+        Table table=Table.read().csv("C:\\Users\\Asus\\OneDrive\\Documents\\Data Science\\Datasets\\sample_corr.csv");
         Table structureOfTable=table.structure();
         Table summaryOfTable=table.summary();
         int totalRows=table.rowCount();
@@ -41,6 +40,8 @@ public class OutlierDetectionUsingZscore {
             double mean=0,stdDev=0;
             Column<?> desiVari=table.column(contVariNames[i]);
             String desiType=desiVari.type().name();
+            System.out.println();
+            System.out.println("Variable: "+contVariNames[i]);
             if(desiType.equals("INTEGER")) {
                 IntColumn ic=(IntColumn)table.column(contVariNames[i]);
                 mean=((IntColumn)table.column(contVariNames[i])).mean();
@@ -56,12 +57,17 @@ public class OutlierDetectionUsingZscore {
                 if(!table.column(contVariNames[i]).isMissing(j)) {
                     double zScore=(((NumberColumn<?,?>)table.column(contVariNames[i])).getDouble(j)-mean)/stdDev;
                     if(zScore<(-3) || zScore>(3)) {
+                        System.out.println("Outlier Found");
+                        System.out.println("Value: "+((NumberColumn<?,?>)table.column(contVariNames[i])).getDouble(j));
+                        System.out.println("Z-Score: "+zScore);
                         table=table.dropRows(j);
                         totalRows-=1;
                     }
                 }
             }
         }
+        System.out.println();
+        System.out.println(table);
         System.out.println(table.summary());
         table.write().toFile("C:\\Users\\Asus\\OneDrive\\Desktop\\newFile.csv");
     }
