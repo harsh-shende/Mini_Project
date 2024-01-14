@@ -6,7 +6,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import tech.tablesaw.selection.Selection;
 
-public class identifyingMissingValues extends naiveBayes {
+import static dataAnalysisAlgorithms.naiveBayes.fillMissingValuesByNaiveBayes;
+import static dataAnalysisAlgorithms.simpleLinearRegression.fillMissingValuesUsingSLR;
+
+public class identifyingMissingValues {
     public static void main(String args[]) {
         long startTime01=System.currentTimeMillis();
         //Creating Variables
@@ -16,7 +19,7 @@ public class identifyingMissingValues extends naiveBayes {
         HashMap<String,Table> hm=new HashMap<>();
 
         //Importing data
-        Table table=Table.read().csv("C:\\Users\\Asus\\OneDrive\\Documents\\Data Science\\Datasets\\student-mat.csv");
+        Table table=Table.read().csv("/home/tendopain/IdeaProjects/Mini_Project/Datasets/numericData.csv");
         Table structureOfTable=table.structure();
 
         //Storing attributes
@@ -57,6 +60,7 @@ public class identifyingMissingValues extends naiveBayes {
             System.out.println();
             fillMissingValuesByNaiveBayes(table,hm.get(s),String.valueOf(s));
         }
+        fillMissingValuesUsingSLR(table);
         long endTime01=System.currentTimeMillis();
         long executionTime01=endTime01-startTime01;
         System.out.println();

@@ -7,11 +7,10 @@ import tech.tablesaw.columns.Column;
 public class outlierDetectionUsingIQR {
     public static void main(String args[]) {
         //Importing data
-        Table table=Table.read().csv("C:\\Users\\Asus\\OneDrive\\Documents\\Data Science\\Datasets\\sample_corr.csv");
+        Table table=Table.read().csv("/home/tendopain/IdeaProjects/Mini_Project/Datasets/sample_corr.csv");
         Table structureOfTable=table.structure();
         Table summaryOfTable=table.summary();
         int totalRows=table.rowCount();
-        System.out.println(table);
         System.out.println(summaryOfTable);
 
         //Storing attributes
@@ -58,15 +57,14 @@ public class outlierDetectionUsingIQR {
                     if(((NumberColumn<?,?>)table.column(contVariNames[i])).getDouble(j)<lowerBound || ((NumberColumn<?,?>)table.column(contVariNames[i])).getDouble(j)>upperBound) {
                         System.out.println("Outlier Found");
                         System.out.println("Value: "+((NumberColumn<?,?>)table.column(contVariNames[i])).getDouble(j));
-                        //table=table.dropRows(j);
-                        //totalRows-=1;
+                        table=table.dropRows(j);
+                        totalRows-=1;
                     }
                 }
             }
         }
         System.out.println();
-        System.out.println(table);
         System.out.println(table.summary());
-        table.write().toFile("C:\\Users\\Asus\\OneDrive\\Desktop\\newFile.csv");
+        table.write().toFile("/home/tendopain/IdeaProjects/Mini_Project/Datasets/newFile.csv");
     }
 }

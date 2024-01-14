@@ -10,7 +10,7 @@ import java.util.Objects;
 public class outlierDetectionUsingZscore {
     public static void main(String args[]) {
         //Importing data
-        Table table=Table.read().csv("C:\\Users\\Asus\\OneDrive\\Documents\\Data Science\\Datasets\\sample_corr.csv");
+        Table table=Table.read().csv("/home/tendopain/IdeaProjects/Mini_Project/Datasets/sample_corr.csv");
         Table structureOfTable=table.structure();
         Table summaryOfTable=table.summary();
         int totalRows=table.rowCount();
@@ -69,6 +69,6 @@ public class outlierDetectionUsingZscore {
         System.out.println();
         System.out.println(table);
         System.out.println(table.summary());
-        table.write().toFile("C:\\Users\\Asus\\OneDrive\\Desktop\\newFile.csv");
+        table.write().toFile("/home/tendopain/IdeaProjects/Mini_Project/Datasets/newFile.csv");
     }
 }

@@ -1,25 +1,17 @@
 package dataAnalysisAlgorithms;
 
+import java.lang.Math;
 import java.util.Objects;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.columns.Column;
 import static dataAnalysisAlgorithms.findingCorrelationMatrix.getCorrelationMatrix;
 
 public class simpleLinearRegression {
-    public static void main(String args[]) {
-        //Importing data
-        Table table=Table.read().csv("C:\\Users\\Asus\\OneDrive\\Documents\\Data Science\\Datasets\\PokemonStats.csv");
+    public static void fillMissingValuesUsingSLR(Table table) {
+        //Creating variables
         double[][] corrMatr=getCorrelationMatrix(table);
         Table structureOfTable=table.structure();
         int totalRows=table.rowCount();
-
-        //Displaying content and structure
-        /*System.out.println(table);
-        System.out.println();
-        System.out.println(structureOfTable);
-        System.out.println();
-        System.out.println(summaryOfTable);
-        System.out.println();*/
 
         //Storing attributes
         String[] attr=table.columnNames().toArray(new String[0]);
@@ -40,13 +32,14 @@ public class simpleLinearRegression {
         }
 
         //Iterating through each and every variable
-        for(int i=0;i<contVariCount;i++) {
+        for(int i=0;i<contVariNames.length;i++) {
             if(table.column(contVariNames[i]).countMissing()!=0) {
                 int posi=0;
                 double maxi=0;
-                for(int j=0;j<contVariCount;j++) {
+                for(int j=0;j<contVariNames.length;j++) {
                     if(i!=j) {
-                        if(corrMatr[i][j]>maxi) {
+                        double curr=Math.abs(corrMatr[i][j]);
+                        if(curr>maxi) {
                             maxi=corrMatr[i][j];
                             posi=j;
                         }
@@ -115,6 +108,25 @@ public class simpleLinearRegression {
                 }
             }
         }
-        table.write().toFile("C:\\Users\\Asus\\OneDrive\\Desktop\\newFile.csv");
+        table.write().toFile("/home/tendopain/IdeaProjects/Mini_Project/Datasets/newFile.csv");
+    }
+
+    public static void main(String args[]) {
+        //Importing data
+        Table table=Table.read().csv("/home/tendopain/IdeaProjects/Mini_Project/Datasets/sample_corr.csv");
+        double[][] corrMatr=getCorrelationMatrix(table);
+        Table structureOfTable=table.structure();
+        int totalRows=table.rowCount();
+
+        //Displaying content and structure
+        /*System.out.println(table);
+        System.out.println();
+        System.out.println(structureOfTable);
+        System.out.println();
+        System.out.println(summaryOfTable);
+        System.out.println();*/
+
+        //Iterating through each and every variable
+        fillMissingValuesUsingSLR(table);
     }
 }
