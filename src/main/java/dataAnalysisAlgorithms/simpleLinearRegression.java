@@ -113,7 +113,7 @@ public class simpleLinearRegression {
 
     public static void main(String args[]) {
         //Importing data
-        Table table=Table.read().csv("/home/tendopain/IdeaProjects/Mini_Project/Datasets/sample_corr.csv");
+        Table table=Table.read().csv("/home/tendopain/IdeaProjects/Mini_Project/Datasets/pokemonStatsData.csv");
         double[][] corrMatr=getCorrelationMatrix(table);
         Table structureOfTable=table.structure();
         int totalRows=table.rowCount();
