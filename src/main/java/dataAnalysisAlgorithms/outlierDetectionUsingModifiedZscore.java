@@ -7,9 +7,8 @@ import tech.tablesaw.api.Table;
 import tech.tablesaw.columns.Column;
 import java.util.Objects;
 
-public class outlierDetectionUsingZscore {
+public class outlierDetectionUsingModifiedZscore {
     public static void main(String args[]) {
-        //Importing data
         Table table=Table.read().csv("/home/tendopain/IdeaProjects/Mini_Project/Datasets/numericData.csv");
         Table structureOfTable=table.structure();
         Table summaryOfTable=table.summary();
@@ -37,29 +36,42 @@ public class outlierDetectionUsingZscore {
 
         //Iterating over continuous variables
         for(int i=0;i<contVariCount;i++) {
-            double mean=0,stdDev=0;
+            int tempRows=0;
+            double medi=0,madi=0;
             Column<?> desiVari=table.column(contVariNames[i]);
             String desiType=desiVari.type().name();
             System.out.println();
             System.out.println("Variable: "+contVariNames[i]);
             if(desiType.equals("INTEGER")) {
                 IntColumn ic=(IntColumn)table.column(contVariNames[i]);
-                mean=((IntColumn)table.column(contVariNames[i])).mean();
-                stdDev=((IntColumn)table.column(contVariNames[i])).standardDeviation();
+                medi=((IntColumn)table.column(contVariNames[i])).median();
             } else {
                 DoubleColumn ic=(DoubleColumn)table.column(contVariNames[i]);
-                mean=((DoubleColumn)table.column(contVariNames[i])).mean();
-                stdDev=((DoubleColumn)table.column(contVariNames[i])).standardDeviation();
+                medi=((DoubleColumn)table.column(contVariNames[i])).median();
             }
 
             //Iterating over rows
             for(int j=0;j<totalRows;j++) {
                 if(!table.column(contVariNames[i]).isMissing(j)) {
-                    double zScore=(((NumberColumn<?,?>)table.column(contVariNames[i])).getDouble(j)-mean)/stdDev;
-                    if(zScore<(-3) || zScore>(3)) {
+                    tempRows+=1;
+                    madi+=((NumberColumn<?,?>)table.column(contVariNames[i])).getDouble(j);
+                }
+            }
+            madi/=tempRows;
+
+            //Iterating over rows
+            for(int j=0;j<totalRows;j++) {
+                if(!table.column(contVariNames[i]).isMissing(j)) {
+                    double modZScore=0.6745;
+                    if(desiType.equals("INTEGER")) {
+                        modZScore*=(((NumberColumn<?,?>)table.column(contVariNames[i])).getDouble(j)-medi)/madi;
+                    } else {
+                        modZScore*=(((NumberColumn<?,?>)table.column(contVariNames[i])).getDouble(j)-medi)/madi;
+                    }
+                    if(modZScore<(-3) || modZScore>(3)) {
                         System.out.println("Outlier Found");
                         System.out.println("Value: "+((NumberColumn<?,?>)table.column(contVariNames[i])).getDouble(j));
-                        System.out.println("Z-Score: "+zScore);
+                        System.out.println("Modified Z-Score: "+modZScore);
                         table=table.dropRows(j);
                         totalRows-=1;
                     }
