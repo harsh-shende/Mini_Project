@@ -54,7 +54,7 @@ public class outlierDetectionUsingModifiedZscore {
             for(int j=0;j<totalRows;j++) {
                 if(!table.column(contVariNames[i]).isMissing(j)) {
                     tempRows+=1;
-                    madi+=((NumberColumn<?,?>)table.column(contVariNames[i])).getDouble(j);
+                    madi+=Math.abs((((NumberColumn<?,?>)table.column(contVariNames[i])).getDouble(j))-medi);
                 }
             }
             madi/=tempRows;
