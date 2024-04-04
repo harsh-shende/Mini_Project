@@ -1,5 +1,7 @@
 package dataAnalysisAlgorithms;
 
+import java.util.List;
+import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 
 public class SplitData {
@@ -49,28 +51,49 @@ public class SplitData {
     }
     public Table calculateTestData() {
         int rows=(this.inputTable.rowCount());
-        Table tempTable=(this.inputTable.last((int)(0.2*rows)));
-        rows=(tempTable.rowCount());
-        return (tempTable.first((int)(0.5*rows)));
+        return (this.inputTable.last((int)(0.2*rows)));
     }
     public Table calculateValidationTable() {
+        Table validationTable=null;
         int rows=(this.inputTable.rowCount());
-        Table tempTable=(this.inputTable.last((int)(0.2*rows)));
-        rows=(tempTable.rowCount());
-        return (tempTable.last((int)(0.5*rows)));
+        int threshold=(int)(0.5*rows);
+        List<String> attributesNames=(this.inputTable.columnNames());
+        int attributesCount=attributesNames.size();
+        for(int i=0;i<rows;i++) {
+            boolean flag=true;
+            Row row01=(this.inputTable.row(i));
+            for(int j=0;j<attributesCount;j++) {
+                if(row01.isMissing(attributesNames.get(j))) {
+                    flag=false;
+                    break;
+                }
+            }
+            if(flag) {
+                if(validationTable==null) {
+                    validationTable=(this.inputTable.first(0));
+                } else {
+                    if((validationTable.rowCount())<threshold) {
+                        validationTable=validationTable.append(row01);
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+        return validationTable;
     }
     public static void main(String[] args) {
         SplitData splitData01=new SplitData(Table.read().csv("/home/tendopain/IdeaProjects/Mini_Project/Datasets/pokemonStatsData.csv"));
         System.out.println("Original Data");
-        System.out.println(splitData01.getInputTable().summary());
+        System.out.println(splitData01.getInputTable().missingValueCounts());
         System.out.println();
         System.out.println("Train Data");
-        System.out.println(splitData01.getTrainData().summary());
+        System.out.println(splitData01.getTrainData().missingValueCounts());
         System.out.println();
         System.out.println("Test Data");
-        System.out.println(splitData01.getTestData().summary());
+        System.out.println(splitData01.getTestData().missingValueCounts());
         System.out.println();
         System.out.println("Validation Data");
-        System.out.println(splitData01.getValidationTable().summary());
+        System.out.println(splitData01.getValidationTable().missingValueCounts());
     }
 }
